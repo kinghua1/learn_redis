@@ -1,0 +1,68 @@
+在 macOS 上使用 OrbStack 运行 Redis 的步骤如下：
+1. 安装 OrbStack
+下载安装包：
+访问 OrbStack 官方网站 https://orbstack.dev/，下载适用于 macOS 的安装包。
+安装：
+双击下载的 .dmg 文件，将 OrbStack 图标拖动到“Applications”文件夹。
+启动 OrbStack：
+从“Applications”文件夹中启动 OrbStack。
+2. 拉取 Redis 镜像
+在终端中运行以下命令拉取 Redis 镜像：
+bash复制
+docker pull redis
+3. 创建数据卷
+创建两个数据卷，分别用于存储 Redis 的配置文件和数据：
+bash复制
+docker volume create redis-config
+docker volume create redis-data
+4. 修改 Redis 配置文件
+进入配置文件目录：
+bash复制
+cd ~/OrbStack/docker/volumes/redis-config
+使用文本编辑器（如 vim）创建并编辑 redis.conf 文件：
+bash复制
+vim redis.conf
+在 redis.conf 文件中添加以下内容：
+conf复制
+# 启用持久化功能
+appendonly yes
+# 设置密码（可选）
+requirepass 12345678
+# 指定数据存储位置
+dir /data
+5. 创建并运行 Redis 容器
+运行以下命令启动 Redis 容器：
+bash复制
+docker run -d --name redis \
+-v redis-config:/usr/local/etc/redis \
+-v redis-data:/data \
+-p 6379:6379 \
+-e LANG=C.UTF-8 \
+redis redis-server /usr/local/etc/redis/redis.conf
+--name redis：指定容器名称。
+-v：挂载配置文件和数据卷。
+-p 6379:6379：将容器的 6379 端口映射到主机的 6379 端口。
+-e LANG=C.UTF-8：设置容器的语言环境变量。
+6. 验证 Redis 容器
+查看 Redis 容器状态：
+bash复制
+docker ps | grep redis
+进入 Redis 容器：
+bash复制
+docker exec -it redis bash
+进入 Redis 控制台：
+bash复制
+redis-cli
+测试 Redis：
+bash复制
+set test_key test_value
+get test_key
+如果能够获取到之前设置的值，说明 Redis 已成功运行。
+7. 停止和重启 Redis 容器
+停止容器：
+bash复制
+docker stop redis
+启动容器：
+bash复制
+docker start redis
+通过以上步骤，你可以在 macOS 上使用 OrbStack 成功运行 Redis 容器。
